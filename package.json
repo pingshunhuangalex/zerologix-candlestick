@@ -1,0 +1,39 @@
+{
+  "name": "zerologix-candlestick",
+  "version": "1.0.0",
+  "description": "A quick candlestick demo for Zerologix",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pingshunhuangalex/zerologix-candlestick.git"
+  },
+  "author": "Pingshun Huang",
+  "license": "MIT",
+  "homepage": "https://github.com/pingshunhuangalex/zerologix-candlestick",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-plugin-syntax-flow": "^6.18.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-latest": "^6.24.1",
+    "babel-preset-react": "^6.24.1"
+  },
+  "dependencies": {
+    "babel-polyfill": "^6.26.0"
+  },
+  "babel": {
+    "only": [
+      "*.babel",
+      "*.jsx",
+      "*.es6"
+    ],
+    "presets": [
+      "latest",
+      "react"
+    ],
+    "plugins": [
+      "transform-runtime"
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+@import 'variables';
+@import 'mixins';
+@import url(https://fonts.googleapis.com/icon?family=Material+Icons);
+
+/* page style reset */
+* {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  @include anscestor;
+}
+
+/* chart style */
+.chart {
+  display: block;
+  margin: 0 auto;
+  width: 400px;
+  height: 250px;
+}
