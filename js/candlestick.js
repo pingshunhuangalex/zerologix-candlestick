@@ -4,6 +4,15 @@ var margin = { top: 20, right: 20, bottom: 30, left: 50 };
 var width = 960 - margin.left - margin.right;
 var height = 500 - margin.top - margin.bottom;
 
+var draw = function draw() {
+  svg.select('g.candlestick').call(candlestick);
+  // using refresh method is more efficient as it does not perform any data joins
+  // Use this if underlying data is not changing
+  // svg.select('g.candlestick').call(candlestick.refresh);
+  svg.select('g.x.axis').call(xAxis);
+  svg.select('g.y.axis').call(yAxis);
+};
+
 var zoomed = function zoomed() {
   var rescaledY = d3.event.transform.rescaleY(y);
   yAxis.scale(rescaledY);
@@ -15,14 +24,43 @@ var zoomed = function zoomed() {
   draw();
 };
 
-var draw = function draw() {
-  svg.select('g.candlestick').call(candlestick);
-  // using refresh method is more efficient as it does not perform any data joins
-  // Use this if underlying data is not changing
-  // svg.select('g.candlestick').call(candlestick.refresh);
-  svg.select('g.x.axis').call(xAxis);
-  svg.select('g.y.axis').call(yAxis);
+var update = function update() {
+  d3.json('../data/data.json', function (error, data) {
+    var accessor = candlestick.accessor();
+    var candleNo = document.querySelector('#candle-control').value;
+    var dataRange = void 0;
+
+    if (candleNo) {
+      dataRange = data.slice(0, candleNo);
+    } else {
+      dataRange = data;
+    }
+
+    data = dataRange.map(function (d) {
+      return {
+        date: new Date(+d.u * 1000),
+        open: +d.o,
+        high: +d.h,
+        low: +d.l,
+        close: +d.c
+      };
+    }).sort(function (a, b) {
+      return d3.ascending(accessor.d(a), accessor.d(b));
+    });
+
+    x.domain(data.map(accessor.d));
+    y.domain(techan.scale.plot.ohlc(data, accessor).domain());
+
+    svg.select('g.candlestick').datum(data);
+    draw();
+
+    // Associate the zoom with the scale after a domain has been applied
+    // Stash initial settings to store as baseline for zooming
+    zoomableInit = x.zoomable().clamp(false).copy();
+  });
 };
+
+document.querySelector('#candle-update').addEventListener('click', update);
 
 var x = techan.scale.financetime().range([0, width]);
 var y = d3.scaleLinear().range([height, 0]);
@@ -44,28 +82,4 @@ svg.append('g').attr('class', 'y axis').append('text').attr('transform', 'rotate
 
 svg.append('rect').attr('class', 'pane').attr('width', width).attr('height', height).call(zoom);
 
-d3.json('../data/data.json', function (error, data) {
-  var accessor = candlestick.accessor();
-
-  data = data.slice(0, 200).map(function (d) {
-    return {
-      date: new Date(+d.u * 1000),
-      open: +d.o,
-      high: +d.h,
-      low: +d.l,
-      close: +d.c
-    };
-  }).sort(function (a, b) {
-    return d3.ascending(accessor.d(a), accessor.d(b));
-  });
-
-  x.domain(data.map(accessor.d));
-  y.domain(techan.scale.plot.ohlc(data, accessor).domain());
-
-  svg.select('g.candlestick').datum(data);
-  draw();
-
-  // Associate the zoom with the scale after a domain has been applied
-  // Stash initial settings to store as baseline for zooming
-  zoomableInit = x.zoomable().clamp(false).copy();
-});
+update();

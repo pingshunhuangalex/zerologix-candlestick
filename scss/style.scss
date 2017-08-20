@@ -16,6 +16,26 @@ body {
 }
 
 /* chart style */
+.candle-control {
+  position: absolute;
+  display: inline-block;
+  margin-top: 50px;
+  margin-left: 50px;
+
+  label {
+    position: absolute;
+    top: -20px;
+    left: 0;
+    color: $primary-text-color;
+    font-weight: bold;
+  }
+
+  button {
+    margin-left: 5px;
+    padding: 0 5px;
+  }
+}
+
 .chart {
   position: absolute;
   top: 0;

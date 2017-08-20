@@ -2,6 +2,15 @@ const margin = {top: 20, right: 20, bottom: 30, left: 50};
 const width = 960 - margin.left - margin.right;
 const height = 500 - margin.top - margin.bottom;
 
+let draw = () => {
+  svg.select('g.candlestick').call(candlestick);
+  // using refresh method is more efficient as it does not perform any data joins
+  // Use this if underlying data is not changing
+  // svg.select('g.candlestick').call(candlestick.refresh);
+  svg.select('g.x.axis').call(xAxis);
+  svg.select('g.y.axis').call(yAxis);
+};
+
 let zoomed = () => {
   let rescaledY = d3.event.transform.rescaleY(y);
   yAxis.scale(rescaledY);
@@ -13,14 +22,43 @@ let zoomed = () => {
   draw();
 };
 
-let draw = () => {
-  svg.select('g.candlestick').call(candlestick);
-  // using refresh method is more efficient as it does not perform any data joins
-  // Use this if underlying data is not changing
-  // svg.select('g.candlestick').call(candlestick.refresh);
-  svg.select('g.x.axis').call(xAxis);
-  svg.select('g.y.axis').call(yAxis);
+let update = () => {
+  d3.json('../data/data.json', (error, data) => {
+    let accessor = candlestick.accessor();
+    let candleNo = document.querySelector('#candle-control').value;
+    let dataRange;
+
+    if (candleNo) {
+      dataRange = data.slice(0, candleNo);
+    } else {
+      dataRange = data;
+    }
+
+    data = dataRange.map(d => {
+      return {
+        date: new Date(+d.u * 1000),
+        open: +d.o,
+        high: +d.h,
+        low: +d.l,
+        close: +d.c,
+      };
+    }).sort((a, b) => {
+      return d3.ascending(accessor.d(a), accessor.d(b));
+    });
+
+    x.domain(data.map(accessor.d));
+    y.domain(techan.scale.plot.ohlc(data, accessor).domain());
+
+    svg.select('g.candlestick').datum(data);
+    draw();
+
+    // Associate the zoom with the scale after a domain has been applied
+    // Stash initial settings to store as baseline for zooming
+    zoomableInit = x.zoomable().clamp(false).copy();
+  });
 };
+
+document.querySelector('#candle-update').addEventListener('click', update);
 
 let x = techan.scale.financetime().range([0, width]);
 let y = d3.scaleLinear().range([height, 0]);
@@ -73,28 +111,4 @@ svg
     .attr('height', height)
     .call(zoom);
 
-d3.json('../data/data.json', (error, data) => {
-  let accessor = candlestick.accessor();
-
-  data = data.slice(0, 200).map(d => {
-    return {
-      date: new Date(+d.u * 1000),
-      open: +d.o,
-      high: +d.h,
-      low: +d.l,
-      close: +d.c,
-    };
-  }).sort((a, b) => {
-    return d3.ascending(accessor.d(a), accessor.d(b));
-  });
-
-  x.domain(data.map(accessor.d));
-  y.domain(techan.scale.plot.ohlc(data, accessor).domain());
-
-  svg.select('g.candlestick').datum(data);
-  draw();
-
-  // Associate the zoom with the scale after a domain has been applied
-  // Stash initial settings to store as baseline for zooming
-  zoomableInit = x.zoomable().clamp(false).copy();
-});
+update();
