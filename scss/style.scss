@@ -17,8 +17,48 @@ body {
 
 /* chart style */
 .chart {
-  display: block;
-  margin: 0 auto;
-  width: 400px;
-  height: 250px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  width: 960px;
+  height: 500px;
+
+  text {
+    fill: $primary-text-color;
+  }
+
+  line {
+    stroke: $primary-text-color;
+  }
+
+  path {
+    stroke: $primary-text-color;
+
+    &.candle {
+      stroke: $primary-text-color;
+    }
+
+    &.body {
+      stroke-width: 0;
+    }
+
+    &.up {
+      fill: $color-candle-up;
+      stroke: $color-candle-up;
+    }
+
+    &.down {
+      fill: $color-candle-down;
+      stroke: $color-candle-down;
+    }
+  }
+
+  rect.pane {
+    cursor: move;
+    fill: none;
+    pointer-events: all;
+  }
 }
