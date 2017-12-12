@@ -27,7 +27,7 @@ var zoomed = function zoomed() {
 var update = function update() {
   d3.json('../data/data.json', function (error, data) {
     var accessor = candlestick.accessor();
-    var candleNo = document.querySelector('#candle-control').value;
+    var candleNo = document.getElementById('candle-control').value;
     var dataRange = void 0;
 
     if (candleNo) {
