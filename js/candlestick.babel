@@ -42,9 +42,8 @@ let update = () => {
         low: +d.l,
         close: +d.c,
       };
-    }).sort((a, b) => {
-      return d3.ascending(accessor.d(a), accessor.d(b));
-    });
+    }).sort((a, b) => d3.ascending(accessor.d(a), accessor.d(b))
+    );
 
     x.domain(data.map(accessor.d));
     y.domain(techan.scale.plot.ohlc(data, accessor).domain());
